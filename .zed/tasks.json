@@ -1,0 +1,7 @@
+[
+	{
+		"label": "Generate",
+		"command": "tree-sitter generate",
+		"reveal": "no_focus"
+	}
+]

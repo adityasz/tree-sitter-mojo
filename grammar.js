@@ -395,12 +395,12 @@ module.exports = grammar({
 		function_definition: ($) =>
 			seq(
 				optional("async"),
-				choice("def", "fn"),
+				field("fn_or_def", choice("fn", "def")),
 				field("name", $.identifier),
 				field("parameters", optional($.parameters)),
 				field("arguments", $.arguments),
 				optional(seq("->", field("return_type", $.type))),
-				optional("raises"),
+				field("raises", optional("raises")),
 				":",
 				field("body", $._suite),
 			),

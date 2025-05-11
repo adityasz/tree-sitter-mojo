@@ -251,6 +251,7 @@ module.exports = grammar({
 				$.try_statement,
 				$.with_statement,
 				$.function_definition,
+				$.trait_definition,
 				$.struct_definition,
 				$.class_definition,
 				$.decorated_definition,

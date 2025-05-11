@@ -32,6 +32,10 @@
         "named": true
       },
       {
+        "type": "trait_definition",
+        "named": true
+      },
+      {
         "type": "try_statement",
         "named": true
       },
@@ -1881,6 +1885,20 @@
           }
         ]
       },
+      "fn_or_def": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "def",
+            "named": false
+          },
+          {
+            "type": "fn",
+            "named": false
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -1898,6 +1916,16 @@
           {
             "type": "parameters",
             "named": true
+          }
+        ]
+      },
+      "raises": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "raises",
+            "named": false
           }
         ]
       },
@@ -3041,6 +3069,42 @@
     }
   },
   {
+    "type": "trait_definition",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "supertraits": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "transfer",
     "named": true,
     "fields": {
@@ -3900,6 +3964,10 @@
   },
   {
     "type": "struct",
+    "named": false
+  },
+  {
+    "type": "trait",
     "named": false
   },
   {

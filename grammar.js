@@ -938,6 +938,7 @@ module.exports = grammar({
 
 		assignment: ($) =>
 			seq(
+				optional(choice("var", "alias")),
 				field("left", $._left_hand_side),
 				choice(
 					seq("=", field("right", $._right_hand_side)),

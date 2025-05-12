@@ -401,8 +401,11 @@ module.exports = grammar({
 				field("name", $.identifier),
 				optional(field("parameters", $.parameters)),
 				field("arguments", $.arguments),
+				optional("raises"),
+				optional("capturing"),
+				optional("escaping"),
+				optional("[_]"), // saw it in the stdlib, can't find its meaning in the docs
 				optional(seq("->", field("return_type", seq(optional($.ref_convention), $.type)))),
-				optional(choice("raises", "capturing", "escaping")),
 				":",
 				field("body", $._suite),
 			),

@@ -17,7 +17,10 @@ const PREC = {
 
 	parenthesized_expression: 1,
 	parenthesized_list_splat: 1,
-	ref: 1,
+	member_type: 2,
+	constrained_type: 2,
+	union_type: 2,
+	ref: 2,
 	or: 10,
 	and: 11,
 	not: 12,
@@ -1080,13 +1083,25 @@ module.exports = grammar({
 				$.union_type,
 				$.constrained_type,
 				$.member_type,
+				$.function_signature
 			),
 		splat_type: ($) => prec(1, seq(choice("*", "**"), $.identifier)),
 		generic_type: ($) =>
 			prec(1, seq(choice($.identifier, alias("type", $.identifier)))),
-		union_type: ($) => prec.left(seq($.type, "|", $.type)),
-		constrained_type: ($) => prec.right(seq($.type, ":", $.type)),
-		member_type: ($) => seq($.type, ".", $.identifier),
+		union_type: ($) => prec(PREC.union_type, prec.left(seq($.type, "|", $.type))),
+		constrained_type: ($) => prec(PREC.constrained_type, prec.right(seq($.type, ":", $.type))),
+		member_type: ($) => prec(PREC.member_type, seq($.type, ".", $.identifier)),
+
+		function_signature: ($) =>
+			seq(
+				choice("fn", "def"),
+				"(", commaSep1($.type), ")",
+				optional("raises"),
+				optional("capturing"),
+				optional("escaping"),
+				optional("[_]"),
+				optional(seq("->", $.type))
+			),
 
 		keyword_argument: ($) =>
 			seq(

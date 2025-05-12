@@ -1936,6 +1936,21 @@
     }
   },
   {
+    "type": "function_signature",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "future_import_statement",
     "named": true,
     "fields": {
@@ -3230,6 +3245,10 @@
           "named": true
         },
         {
+          "type": "function_signature",
+          "named": true
+        },
+        {
           "type": "generic_type",
           "named": true
         },
@@ -3735,6 +3754,10 @@
   },
   {
     "type": "[",
+    "named": false
+  },
+  {
+    "type": "[_]",
     "named": false
   },
   {

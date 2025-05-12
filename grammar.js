@@ -3,6 +3,54 @@
  * Max Brunsfeld <maxbrunsfeld@gmail.com>
  *
  * The language of this grammar is a superset of Mojo.
+ *
+ * In Mojo, functions take parameters and arguments:
+ *
+ * ```mojo
+ * fn foo[
+ *     parameters...
+ * ](
+ *     arguments...
+ * ) -> return_value_type:
+ *     function_body
+ * ```
+ *
+ * In this grammar, parameters are referred to as `comptime_parameters`
+ * in function definitions, and `comptime_arguments` in function calls.
+ * This is because the Python grammar (which is used as a base) uses
+ * `parameters` for arguments in function definitions and `arguments`
+ * for arguments in function calls.
+ *
+ * It is not possible to syntax highlight Mojo without semantic
+ * information; for example:
+ *
+ * ```mojo
+ * @value
+ * struct Foo:
+ *     var x: Int
+ *
+ *     fn __init__(out self, x: Int = 0):
+ *         self.x = x
+ *
+ *     fn __call__(self) -> Int:
+ *         return self.x
+ *
+ *
+ * fn func[x: Int]() -> Int:
+ *     return x
+ *
+ *
+ * fn main():
+ *     var list = List(Foo(), Foo())
+ *     print(list[0]())  # list is a variable
+ *     print(func[0]())  # func is a function
+ * ```
+ *
+ * Function calls are more common, and hence I created a new rule for
+ * calling functions with parameters (comptime arguments) that has
+ * higher precedence than a subscript. This grammar was written just to
+ * get syntax highlighting and file outline to work in Zed until the
+ * pull request for semantic syntax highlighting gets across the line.
  */
 
 /// <reference types="tree-sitter-cli/dsl" />
@@ -17,10 +65,10 @@ const PREC = {
 
 	parenthesized_expression: 1,
 	parenthesized_list_splat: 1,
+	ref: 2,
 	member_type: 2,
 	constrained_type: 2,
 	union_type: 2,
-	ref: 2,
 	or: 10,
 	and: 11,
 	not: 12,
@@ -33,7 +81,8 @@ const PREC = {
 	times: 19,
 	unary: 20,
 	power: 21,
-	call: 22,
+	call_with_comptime_arguments: 22,
+	call: 23,
 };
 
 const SEMICOLON = ";";
@@ -57,7 +106,7 @@ module.exports = grammar({
 		[$.print_statement, $.primary_expression],
 		[$.type_alias_statement, $.primary_expression],
 		[$.match_statement, $.primary_expression],
-		[$.parameter_list, $.subscript]
+		[$.subscript, $.comptime_argument_list],
 	],
 
 	supertypes: ($) => [
@@ -402,24 +451,36 @@ module.exports = grammar({
 				optional("async"),
 				field("fn_or_def", choice("fn", "def")),
 				field("name", $.identifier),
-				optional(field("parameters", $.parameters)),
-				field("arguments", $.arguments),
+				field("comptime_parameters", $.comptime_parameters),
+				field("parameters", $.parameters),
 				optional("raises"),
 				optional("capturing"),
 				optional("escaping"),
 				optional("[_]"), // saw it in the stdlib, can't find its meaning in the docs
-				optional(seq("->", field("return_type", seq(optional($.ref_convention), $.type)))),
+				optional(
+					seq(
+						"->",
+						field(
+							"return_type",
+							seq(optional($.ref_convention), $.type),
+						),
+					),
+				),
 				":",
 				field("body", $._suite),
 			),
 
-		ref_convention: ($) => prec.right(PREC.ref, seq("ref", optional(seq("[", $.expression, "]")))),
+		ref_convention: ($) =>
+			prec.right(
+				PREC.ref,
+				seq("ref", optional(seq("[", $.expression, "]"))),
+			),
 
-		arguments: ($) => seq("(", optional($._arguments), ")"),
+		comptime_parameters: ($) => seq("[", optional($._parameters), "]"),
 
-		parameters: ($) => seq("[", optional($._parameters), "]"),
+		parameters: ($) => seq("(", optional($._parameters), ")"),
 
-		lambda_arguments: ($) => $._arguments,
+		lambda_parameters: ($) => $._parameters,
 
 		list_splat: ($) => seq("*", $.expression),
 
@@ -455,7 +516,7 @@ module.exports = grammar({
 			seq(
 				"struct",
 				field("name", $.identifier),
-				field("parameters", $.parameters),
+				field("comptime_parameters", $.comptime_parameters),
 				field("traits", optional($.argument_list)),
 				":",
 				field("body", $._suite),
@@ -466,7 +527,7 @@ module.exports = grammar({
 			seq(
 				"class",
 				field("name", $.identifier),
-				field("parameters", $.parameters),
+				field("comptime_parameters", $.comptime_parameters),
 				field("superclasses", optional($.argument_list)),
 				":",
 				field("body", $._suite),
@@ -485,6 +546,30 @@ module.exports = grammar({
 						$.list_splat,
 					),
 					")",
+				),
+			),
+
+		comptime_argument_list: ($) =>
+			prec(
+				PREC.call_with_comptime_arguments,
+				seq(
+					"[",
+					optional(
+						commaSep1(
+							choice(
+								$.expression,
+								$.list_splat,
+								$.dictionary_splat,
+								alias(
+									$.parenthesized_list_splat,
+									$.parenthesized_expression,
+								),
+								$.keyword_argument,
+							),
+						),
+					),
+					optional(","),
+					"]",
 				),
 			),
 
@@ -509,33 +594,12 @@ module.exports = grammar({
 				")",
 			),
 
-		parameter_list: ($) =>
-			seq(
-				"[",
-				optional(
-					commaSep1(
-						choice(
-							$.expression,
-							$.list_splat,
-							$.dictionary_splat,
-							alias(
-								$.parenthesized_list_splat,
-								$.parenthesized_expression,
-							),
-							$.keyword_argument,
-						),
-					),
-				),
-				optional(","),
-				"]",
-			),
-
 		decorated_definition: ($) =>
 			seq(
 				repeat1($.decorator),
 				field(
 					"definition",
-					choice($.struct_definition, $.function_definition),
+					choice($.class_definition, $.function_definition),
 				),
 			),
 
@@ -668,17 +732,20 @@ module.exports = grammar({
 
 		// Patterns
 
-		_arguments: ($) =>
+		_parameters: ($) =>
 			seq(
 				commaSep1(
 					seq(
 						optional(
-							choice(
-								"read",
-								"mut",
-								"owned",
-								"out",
-								$.ref_convention,
+							field(
+								"argument_convention",
+								choice(
+									"read",
+									"mut",
+									"owned",
+									"out",
+									$.ref_convention,
+								),
 							),
 						),
 						$.parameter,
@@ -687,7 +754,7 @@ module.exports = grammar({
 				optional(","),
 			),
 
-		_parameters: ($) => seq(commaSep1($.parameter), optional(",")),
+		_patterns: ($) => seq(commaSep1($.pattern), optional(",")),
 
 		parameter: ($) =>
 			choice(
@@ -698,19 +765,16 @@ module.exports = grammar({
 				$.list_splat_pattern,
 				$.tuple_pattern,
 				$.keyword_separator,
-				$.positional_separator,
 				$.infer_separator,
+				$.positional_separator,
 				$.dictionary_splat_pattern,
 			),
-
-		_patterns: ($) => seq(commaSep1($.pattern), optional(",")),
 
 		pattern: ($) =>
 			choice(
 				$.identifier,
 				$.keyword_identifier,
 				$.subscript,
-				$.dereference,
 				$.attribute,
 				$.list_splat_pattern,
 				$.tuple_pattern,
@@ -809,9 +873,9 @@ module.exports = grammar({
 				$.unary_operator,
 				$.attribute,
 				$.subscript,
-				$.dereference,
 				$.transfer,
 				$.call,
+				$.call_with_comptime_arguments,
 				$.list,
 				$.list_comprehension,
 				$.dictionary,
@@ -928,7 +992,7 @@ module.exports = grammar({
 				PREC.lambda,
 				seq(
 					"lambda",
-					field("arguments", optional($.lambda_arguments)),
+					field("parameters", optional($.lambda_parameters)),
 					":",
 					field("body", $.expression),
 				),
@@ -937,7 +1001,7 @@ module.exports = grammar({
 		lambda_within_for_in_clause: ($) =>
 			seq(
 				"lambda",
-				field("arguments", optional($.lambda_arguments)),
+				field("parameters", optional($.lambda_parameters)),
 				":",
 				field("body", $._expression_within_for_in_clause),
 			),
@@ -1024,16 +1088,15 @@ module.exports = grammar({
 				seq(
 					field("value", $.primary_expression),
 					"[",
-					commaSep1(
-						field("subscript", choice($.expression, $.slice)),
+					optional( // optional for pointer dereference
+						commaSep1(
+							field("subscript", choice($.expression, $.slice)),
+						),
 					),
 					optional(","),
 					"]",
 				),
 			),
-
-		dereference: ($) =>
-			prec(PREC.call, seq(field("value", $.identifier), "[", "]")),
 
 		transfer: ($) =>
 			prec(PREC.call, seq(field("value", $.identifier), "^")),
@@ -1048,12 +1111,24 @@ module.exports = grammar({
 
 		ellipsis: (_) => "...",
 
+		call_with_comptime_arguments: ($) =>
+			prec(
+				PREC.call_with_comptime_arguments,
+				seq(
+					field("function", $.primary_expression),
+					field("comptime_arguments", $.comptime_argument_list),
+					field(
+						"arguments",
+						choice($.generator_expression, $.argument_list),
+					),
+				),
+			),
+
 		call: ($) =>
 			prec(
 				PREC.call,
 				seq(
 					field("function", $.primary_expression),
-					field("parameters", optional($.parameter_list)),
 					field(
 						"arguments",
 						choice($.generator_expression, $.argument_list),
@@ -1083,24 +1158,35 @@ module.exports = grammar({
 				$.union_type,
 				$.constrained_type,
 				$.member_type,
-				$.function_signature
+				$.function_type,
 			),
 		splat_type: ($) => prec(1, seq(choice("*", "**"), $.identifier)),
 		generic_type: ($) =>
 			prec(1, seq(choice($.identifier, alias("type", $.identifier)))),
-		union_type: ($) => prec(PREC.union_type, prec.left(seq($.type, "|", $.type))),
-		constrained_type: ($) => prec(PREC.constrained_type, prec.right(seq($.type, ":", $.type))),
-		member_type: ($) => prec(PREC.member_type, seq($.type, ".", $.identifier)),
-
-		function_signature: ($) =>
+		union_type: ($) =>
+			prec(PREC.union_type, prec.left(seq($.type, "|", $.type))),
+		constrained_type: ($) =>
+			prec(PREC.constrained_type, prec.right(seq($.type, ":", $.type))),
+		member_type: ($) =>
+			prec(PREC.member_type, seq($.type, ".", $.identifier)),
+		function_type: ($) =>
 			seq(
 				choice("fn", "def"),
-				"(", commaSep1($.type), ")",
+				optional(seq("[", optional(commaSep1($.type)), "]")),
+				seq("(", optional(commaSep1($.type)), ")"),
 				optional("raises"),
 				optional("capturing"),
 				optional("escaping"),
-				optional("[_]"),
-				optional(seq("->", $.type))
+				optional("[_]"), // saw it in the stdlib, can't find its meaning in the docs
+				optional(
+					seq(
+						"->",
+						field(
+							"return_type",
+							seq(optional($.ref_convention), $.type),
+						),
+					),
+				),
 			),
 
 		keyword_argument: ($) =>
@@ -1338,8 +1424,8 @@ module.exports = grammar({
 		line_continuation: (_) =>
 			token(seq("\\", choice(seq(optional("\r"), "\n"), "\0"))),
 
-		positional_separator: (_) => "/",
 		infer_separator: (_) => "//",
+		positional_separator: (_) => "/",
 		keyword_separator: (_) => "*",
 	},
 });

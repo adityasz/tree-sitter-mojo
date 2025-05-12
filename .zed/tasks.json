@@ -8,5 +8,10 @@
 		"label": "Build",
 		"command": "tree-sitter build",
 		"reveal": "no_focus"
+	},
+	{
+		"label": "Playground",
+		"command": "tree-sitter build --wasm && tree-sitter playground",
+		"reveal": "no_focus"
 	}
 ]

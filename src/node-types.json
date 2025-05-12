@@ -1037,7 +1037,7 @@
       },
       "comptime_parameters": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "comptime_parameters",
@@ -1941,7 +1941,7 @@
       },
       "comptime_parameters": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "comptime_parameters",
@@ -3130,7 +3130,7 @@
       },
       "comptime_parameters": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "comptime_parameters",

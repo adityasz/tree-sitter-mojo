@@ -451,7 +451,7 @@ module.exports = grammar({
 				optional("async"),
 				field("fn_or_def", choice("fn", "def")),
 				field("name", $.identifier),
-				field("comptime_parameters", $.comptime_parameters),
+				optional(field("comptime_parameters", $.comptime_parameters)),
 				field("parameters", $.parameters),
 				optional("raises"),
 				optional("capturing"),
@@ -507,7 +507,7 @@ module.exports = grammar({
 			seq(
 				"trait",
 				field("name", $.identifier),
-				field("supertraits", optional($.argument_list)),
+				optional(field("supertraits", optional($.argument_list))),
 				":",
 				field("body", $._suite),
 			),
@@ -516,7 +516,7 @@ module.exports = grammar({
 			seq(
 				"struct",
 				field("name", $.identifier),
-				field("comptime_parameters", $.comptime_parameters),
+				optional(field("comptime_parameters", $.comptime_parameters)),
 				field("traits", optional($.argument_list)),
 				":",
 				field("body", $._suite),
@@ -527,7 +527,7 @@ module.exports = grammar({
 			seq(
 				"class",
 				field("name", $.identifier),
-				field("comptime_parameters", $.comptime_parameters),
+				optional(field("comptime_parameters", $.comptime_parameters)),
 				field("superclasses", optional($.argument_list)),
 				":",
 				field("body", $._suite),

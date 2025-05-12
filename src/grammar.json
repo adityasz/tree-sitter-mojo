@@ -1637,12 +1637,20 @@
           }
         },
         {
-          "type": "FIELD",
-          "name": "comptime_parameters",
-          "content": {
-            "type": "SYMBOL",
-            "name": "comptime_parameters"
-          }
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "comptime_parameters",
+              "content": {
+                "type": "SYMBOL",
+                "name": "comptime_parameters"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "FIELD",
@@ -2059,20 +2067,28 @@
           }
         },
         {
-          "type": "FIELD",
-          "name": "supertraits",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "argument_list"
-              },
-              {
-                "type": "BLANK"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "supertraits",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "argument_list"
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
               }
-            ]
-          }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "STRING",
@@ -2104,12 +2120,20 @@
           }
         },
         {
-          "type": "FIELD",
-          "name": "comptime_parameters",
-          "content": {
-            "type": "SYMBOL",
-            "name": "comptime_parameters"
-          }
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "comptime_parameters",
+              "content": {
+                "type": "SYMBOL",
+                "name": "comptime_parameters"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "FIELD",
@@ -2157,12 +2181,20 @@
           }
         },
         {
-          "type": "FIELD",
-          "name": "comptime_parameters",
-          "content": {
-            "type": "SYMBOL",
-            "name": "comptime_parameters"
-          }
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "comptime_parameters",
+              "content": {
+                "type": "SYMBOL",
+                "name": "comptime_parameters"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "FIELD",

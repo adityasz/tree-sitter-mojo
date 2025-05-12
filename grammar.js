@@ -17,6 +17,7 @@ const PREC = {
 
 	parenthesized_expression: 1,
 	parenthesized_list_splat: 1,
+	ref: 1,
 	or: 10,
 	and: 11,
 	not: 12,
@@ -398,13 +399,15 @@ module.exports = grammar({
 				optional("async"),
 				field("fn_or_def", choice("fn", "def")),
 				field("name", $.identifier),
-				field("parameters", optional($.parameters)),
+				optional(field("parameters", $.parameters)),
 				field("arguments", $.arguments),
-				optional(seq("->", field("return_type", $.type))),
-				field("raises", optional("raises")),
+				optional(seq("->", field("return_type", seq(optional($.ref_convention), $.type)))),
+				optional(choice("raises", "capturing", "escaping")),
 				":",
 				field("body", $._suite),
 			),
+
+		ref_convention: ($) => prec.right(PREC.ref, seq("ref", optional(seq("[", $.expression, "]")))),
 
 		arguments: ($) => seq("(", optional($._arguments), ")"),
 
@@ -668,11 +671,8 @@ module.exports = grammar({
 								"read",
 								"mut",
 								"owned",
-								seq(
-									"ref",
-									optional(seq("[", $.expression, "]")),
-								),
 								"out",
+								$.ref_convention,
 							),
 						),
 						$.parameter,
@@ -682,8 +682,6 @@ module.exports = grammar({
 			),
 
 		_parameters: ($) => seq(commaSep1($.parameter), optional(",")),
-
-		_patterns: ($) => seq(commaSep1($.pattern), optional(",")),
 
 		parameter: ($) =>
 			choice(
@@ -698,6 +696,8 @@ module.exports = grammar({
 				$.infer_separator,
 				$.dictionary_splat_pattern,
 			),
+
+		_patterns: ($) => seq(commaSep1($.pattern), optional(",")),
 
 		pattern: ($) =>
 			choice(

@@ -3,5 +3,10 @@
 		"label": "Generate",
 		"command": "tree-sitter generate",
 		"reveal": "no_focus"
+	},
+	{
+		"label": "Build",
+		"command": "tree-sitter build",
+		"reveal": "no_focus"
 	}
 ]

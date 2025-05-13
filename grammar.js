@@ -476,7 +476,7 @@ module.exports = grammar({
 				seq("ref", optional(seq("[", $.expression, "]"))),
 			),
 
-		comptime_parameters: ($) => seq("[", optional($._parameters), "]"),
+		comptime_parameters: ($) => seq("[", optional($._comptime_parameters), "]"),
 
 		parameters: ($) => seq("(", optional($._parameters), ")"),
 
@@ -731,6 +731,8 @@ module.exports = grammar({
 			),
 
 		// Patterns
+
+		_comptime_parameters: ($) => seq(commaSep1($.parameter), optional(",")),
 
 		_parameters: ($) =>
 			seq(

@@ -599,7 +599,7 @@ module.exports = grammar({
 				repeat1($.decorator),
 				field(
 					"definition",
-					choice($.class_definition, $.function_definition),
+					choice($.trait_definition, $.struct_definition, $.class_definition, $.function_definition),
 				),
 			),
 

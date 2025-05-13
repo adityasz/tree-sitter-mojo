@@ -2503,6 +2503,14 @@
             "members": [
               {
                 "type": "SYMBOL",
+                "name": "trait_definition"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "struct_definition"
+              },
+              {
+                "type": "SYMBOL",
                 "name": "class_definition"
               },
               {

@@ -305,7 +305,7 @@ module.exports = grammar({
 				$.trait_definition,
 				$.struct_definition,
 				$.class_definition,
-				$.decorated_definition,
+				$.decorated_statement,
 				$.match_statement,
 			),
 
@@ -568,12 +568,19 @@ module.exports = grammar({
 				")",
 			),
 
-		decorated_definition: ($) =>
+		decorated_statement: ($) =>
 			seq(
 				repeat1($.decorator),
 				field(
 					"definition",
-					choice($.trait_definition, $.struct_definition, $.class_definition, $.function_definition),
+					choice(
+						$.trait_definition,
+						$.struct_definition,
+						$.class_definition,
+						$.function_definition,
+						$.if_statement,
+						$.for_statement
+					),
 				),
 			),
 

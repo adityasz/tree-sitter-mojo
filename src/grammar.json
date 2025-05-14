@@ -801,7 +801,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "decorated_definition"
+          "name": "decorated_statement"
         },
         {
           "type": "SYMBOL",

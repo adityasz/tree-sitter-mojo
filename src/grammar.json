@@ -1814,7 +1814,7 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "_parameters"
+              "name": "_comptime_parameters"
             },
             {
               "type": "BLANK"
@@ -2261,120 +2261,6 @@
         ]
       }
     },
-    "comptime_argument_list": {
-      "type": "PREC",
-      "value": 22,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "["
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "expression"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "list_splat"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "dictionary_splat"
-                      },
-                      {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "SYMBOL",
-                          "name": "parenthesized_list_splat"
-                        },
-                        "named": true,
-                        "value": "parenthesized_expression"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "keyword_argument"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "REPEAT",
-                    "content": {
-                      "type": "SEQ",
-                      "members": [
-                        {
-                          "type": "STRING",
-                          "value": ","
-                        },
-                        {
-                          "type": "CHOICE",
-                          "members": [
-                            {
-                              "type": "SYMBOL",
-                              "name": "expression"
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "list_splat"
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "dictionary_splat"
-                            },
-                            {
-                              "type": "ALIAS",
-                              "content": {
-                                "type": "SYMBOL",
-                                "name": "parenthesized_list_splat"
-                              },
-                              "named": true,
-                              "value": "parenthesized_expression"
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "keyword_argument"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "STRING",
-                "value": ","
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
-            "type": "STRING",
-            "value": "]"
-          }
-        ]
-      }
-    },
     "argument_list": {
       "type": "SEQ",
       "members": [
@@ -2485,7 +2371,7 @@
         }
       ]
     },
-    "decorated_definition": {
+    "decorated_statement": {
       "type": "SEQ",
       "members": [
         {
@@ -2516,6 +2402,14 @@
               {
                 "type": "SYMBOL",
                 "name": "function_definition"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "if_statement"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "for_statement"
               }
             ]
           }
@@ -3267,6 +3161,48 @@
         ]
       }
     },
+    "_comptime_parameters": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "parameter"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": ","
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "parameter"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": ","
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
     "_parameters": {
       "type": "SEQ",
       "members": [
@@ -3849,10 +3785,6 @@
         {
           "type": "SYMBOL",
           "name": "call"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "call_with_comptime_arguments"
         },
         {
           "type": "SYMBOL",
@@ -4983,7 +4915,7 @@
     },
     "attribute": {
       "type": "PREC",
-      "value": 23,
+      "value": 22,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5012,7 +4944,7 @@
     },
     "subscript": {
       "type": "PREC",
-      "value": 23,
+      "value": 22,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5046,7 +4978,24 @@
                         },
                         {
                           "type": "SYMBOL",
-                          "name": "slice"
+                          "name": "list_splat"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "dictionary_splat"
+                        },
+                        {
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "SYMBOL",
+                            "name": "parenthesized_list_splat"
+                          },
+                          "named": true,
+                          "value": "parenthesized_expression"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "keyword_argument"
                         }
                       ]
                     }
@@ -5072,7 +5021,24 @@
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "slice"
+                                "name": "list_splat"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "dictionary_splat"
+                              },
+                              {
+                                "type": "ALIAS",
+                                "content": {
+                                  "type": "SYMBOL",
+                                  "name": "parenthesized_list_splat"
+                                },
+                                "named": true,
+                                "value": "parenthesized_expression"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "keyword_argument"
                               }
                             ]
                           }
@@ -5108,7 +5074,7 @@
     },
     "transfer": {
       "type": "PREC",
-      "value": 23,
+      "value": 22,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5193,51 +5159,9 @@
       "type": "STRING",
       "value": "..."
     },
-    "call_with_comptime_arguments": {
-      "type": "PREC",
-      "value": 22,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "FIELD",
-            "name": "function",
-            "content": {
-              "type": "SYMBOL",
-              "name": "primary_expression"
-            }
-          },
-          {
-            "type": "FIELD",
-            "name": "comptime_arguments",
-            "content": {
-              "type": "SYMBOL",
-              "name": "comptime_argument_list"
-            }
-          },
-          {
-            "type": "FIELD",
-            "name": "arguments",
-            "content": {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "generator_expression"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "argument_list"
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
     "call": {
       "type": "PREC",
-      "value": 23,
+      "value": 22,
       "content": {
         "type": "SEQ",
         "members": [
@@ -7015,10 +6939,6 @@
     [
       "match_statement",
       "primary_expression"
-    ],
-    [
-      "subscript",
-      "comptime_argument_list"
     ]
   ],
   "precedences": [],

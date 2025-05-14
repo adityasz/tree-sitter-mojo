@@ -8,7 +8,7 @@
         "named": true
       },
       {
-        "type": "decorated_definition",
+        "type": "decorated_statement",
         "named": true
       },
       {
@@ -251,10 +251,6 @@
       },
       {
         "type": "call",
-        "named": true
-      },
-      {
-        "type": "call_with_comptime_arguments",
         "named": true
       },
       {
@@ -852,46 +848,6 @@
     }
   },
   {
-    "type": "call_with_comptime_arguments",
-    "named": true,
-    "fields": {
-      "arguments": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "argument_list",
-            "named": true
-          },
-          {
-            "type": "generator_expression",
-            "named": true
-          }
-        ]
-      },
-      "comptime_arguments": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "comptime_argument_list",
-            "named": true
-          }
-        ]
-      },
-      "function": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "primary_expression",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
     "type": "case_clause",
     "named": true,
     "fields": {
@@ -1172,67 +1128,9 @@
     }
   },
   {
-    "type": "comptime_argument_list",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "dictionary_splat",
-          "named": true
-        },
-        {
-          "type": "expression",
-          "named": true
-        },
-        {
-          "type": "keyword_argument",
-          "named": true
-        },
-        {
-          "type": "list_splat",
-          "named": true
-        },
-        {
-          "type": "parenthesized_expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "comptime_parameters",
     "named": true,
-    "fields": {
-      "argument_convention": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "mut",
-            "named": false
-          },
-          {
-            "type": "out",
-            "named": false
-          },
-          {
-            "type": "owned",
-            "named": false
-          },
-          {
-            "type": "read",
-            "named": false
-          },
-          {
-            "type": "ref_convention",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
       "multiple": true,
       "required": false,
@@ -1295,7 +1193,7 @@
     "fields": {}
   },
   {
-    "type": "decorated_definition",
+    "type": "decorated_statement",
     "named": true,
     "fields": {
       "definition": {
@@ -1307,7 +1205,15 @@
             "named": true
           },
           {
+            "type": "for_statement",
+            "named": true
+          },
+          {
             "type": "function_definition",
+            "named": true
+          },
+          {
+            "type": "if_statement",
             "named": true
           },
           {
@@ -3032,21 +2938,6 @@
     }
   },
   {
-    "type": "slice",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "splat_pattern",
     "named": true,
     "fields": {},
@@ -3177,11 +3068,23 @@
         "required": false,
         "types": [
           {
+            "type": "dictionary_splat",
+            "named": true
+          },
+          {
             "type": "expression",
             "named": true
           },
           {
-            "type": "slice",
+            "type": "keyword_argument",
+            "named": true
+          },
+          {
+            "type": "list_splat",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
             "named": true
           }
         ]

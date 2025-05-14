@@ -81,8 +81,7 @@ const PREC = {
 	times: 19,
 	unary: 20,
 	power: 21,
-	call_with_comptime_arguments: 22,
-	call: 23,
+	call: 22,
 };
 
 const SEMICOLON = ";";
@@ -106,7 +105,6 @@ module.exports = grammar({
 		[$.print_statement, $.primary_expression],
 		[$.type_alias_statement, $.primary_expression],
 		[$.match_statement, $.primary_expression],
-		[$.subscript, $.comptime_argument_list],
 	],
 
 	supertypes: ($) => [
@@ -549,30 +547,6 @@ module.exports = grammar({
 				),
 			),
 
-		comptime_argument_list: ($) =>
-			prec(
-				PREC.call_with_comptime_arguments,
-				seq(
-					"[",
-					optional(
-						commaSep1(
-							choice(
-								$.expression,
-								$.list_splat,
-								$.dictionary_splat,
-								alias(
-									$.parenthesized_list_splat,
-									$.parenthesized_expression,
-								),
-								$.keyword_argument,
-							),
-						),
-					),
-					optional(","),
-					"]",
-				),
-			),
-
 		argument_list: ($) =>
 			seq(
 				"(",
@@ -877,7 +851,6 @@ module.exports = grammar({
 				$.subscript,
 				$.transfer,
 				$.call,
-				$.call_with_comptime_arguments,
 				$.list,
 				$.list_comprehension,
 				$.dictionary,
@@ -1090,9 +1063,21 @@ module.exports = grammar({
 				seq(
 					field("value", $.primary_expression),
 					"[",
-					optional( // optional for pointer dereference
+					optional(
 						commaSep1(
-							field("subscript", choice($.expression, $.slice)),
+							field(
+								"subscript",
+								choice(
+									$.expression,
+									$.list_splat,
+									$.dictionary_splat,
+									alias(
+										$.parenthesized_list_splat,
+										$.parenthesized_expression,
+									),
+									$.keyword_argument,
+								),
+							),
 						),
 					),
 					optional(","),
@@ -1112,19 +1097,6 @@ module.exports = grammar({
 			),
 
 		ellipsis: (_) => "...",
-
-		call_with_comptime_arguments: ($) =>
-			prec(
-				PREC.call_with_comptime_arguments,
-				seq(
-					field("function", $.primary_expression),
-					field("comptime_arguments", $.comptime_argument_list),
-					field(
-						"arguments",
-						choice($.generator_expression, $.argument_list),
-					),
-				),
-			),
 
 		call: ($) =>
 			prec(

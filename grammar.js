@@ -46,11 +46,14 @@
  *     print(func[0]())  # func is a function
  * ```
  *
- * Function calls are more common, and hence I created a new rule for
- * calling functions with parameters (comptime arguments) that has
- * higher precedence than a subscript. This grammar was written just to
- * get syntax highlighting and file outline to work in Zed until the
- * pull request for semantic syntax highlighting gets across the line.
+ * While new rules can be created to at least handle the case where
+ * keyword comptime arguments are provided in calls (e.g.,
+ * `foo[mut=False](bar)`), it is not worth the effort: This grammar was
+ * written just to get syntax highlighting and file outline to work in
+ * Zed until semantix syntax highlighting gets merged, and until then, I
+ * can just treat all calls with a `subscript` as the function
+ * `primary_expression` to be calls of a parametrized function (as
+ * that is more common in my code).
  */
 
 /// <reference types="tree-sitter-cli/dsl" />
